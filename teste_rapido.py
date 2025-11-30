@@ -16,42 +16,47 @@ def teste_rapido():
     sistema = AvaliacaoApresentacaoFuzzy()
     print("✅ Sistema criado com sucesso!")
 
-    # Define casos de teste
+    # Define casos de teste (agora com 6 parâmetros: +organizacao)
     casos_teste = [
         {
-            'nome': '🟣 Apresentação PERFEITA (Nota 10)',
-            'valores': (10.0, 10.0, 5.0, 10.0, 10.0),
+            'nome': '🟣 Apresentação PERFEITA (Nota ~10)',
+            'valores': (9.5, 9.5, 5.0, 9.0, 9.5, 9.5),
             'esperado': 'Excelente'
         },
         {
             'nome': '🟣 Apresentação EXCELENTE',
-            'valores': (9.0, 9.5, 6.0, 8.5, 9.0),
+            'valores': (9.0, 9.5, 6.0, 8.5, 9.0, 9.0),
+            'esperado': 'Excelente'
+        },
+        {
+            'nome': '🟣 Organização Compensa Materiais',
+            'valores': (8.5, 9.0, 5.0, 5.0, 8.0, 9.5),
             'esperado': 'Excelente'
         },
         {
             'nome': '🔵 Apresentação MUITO BOA',
-            'valores': (8.0, 8.5, 5.5, 6.0, 8.0),
+            'valores': (8.0, 8.5, 5.5, 6.0, 8.0, 7.5),
             'esperado': 'Muito Bom'
         },
         {
             'nome': '🟢 Apresentação BOA',
-            'valores': (7.0, 7.0, 6.0, 7.0, 6.5),
+            'valores': (7.0, 7.0, 6.0, 7.0, 6.5, 7.0),
             'esperado': 'Bom'
         },
         {
             'nome': '🟡 Apresentação ACEITÁVEL',
-            'valores': (5.0, 5.0, 5.0, 5.0, 5.0),
+            'valores': (5.0, 5.0, 5.0, 5.0, 5.0, 5.0),
             'esperado': 'Aceitável'
         },
         {
             'nome': '🔴 Apresentação PRECISA MELHORAR',
-            'valores': (2.0, 3.0, 4.0, 2.5, 2.0),
+            'valores': (2.0, 3.0, 4.0, 2.5, 2.0, 2.0),
             'esperado': 'Precisa Melhorar'
         }
     ]
 
     # Executa testes
-    print("\n2️⃣ Executando 6 casos de teste...\n")
+    print("\n2️⃣ Executando 7 casos de teste...\n")
 
     sucessos = 0
     for i, caso in enumerate(casos_teste, 1):
@@ -59,15 +64,16 @@ def teste_rapido():
         print(f"Teste {i}: {caso['nome']}")
         print(f"{'-' * 70}")
 
-        clareza, dominio, ritmo, materiais, engajamento = caso['valores']
+        clareza, dominio, ritmo, materiais, engajamento, organizacao = caso['valores']
 
         print(f"  Clareza:      {clareza}/10")
         print(f"  Domínio:      {dominio}/10")
         print(f"  Ritmo:        {ritmo}/10")
         print(f"  Materiais:    {materiais}/10")
         print(f"  Engajamento:  {engajamento}/10")
+        print(f"  Organização:  {organizacao}/10")
 
-        resultado = sistema.avaliar(clareza, dominio, ritmo, materiais, engajamento)
+        resultado = sistema.avaliar(clareza, dominio, ritmo, materiais, engajamento, organizacao)
 
         print(f"\n  📊 RESULTADO:")
         print(f"     Nota: {resultado['nota']}/10")

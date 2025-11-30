@@ -15,13 +15,14 @@ def exemplo_basico():
     
     sistema = AvaliacaoApresentacaoFuzzy()
 
-    
+
     resultado = sistema.avaliar(
         clareza_val=7.5,
         dominio_val=8.0,
         ritmo_val=6.0,
         materiais_val=7.0,
-        engajamento_val=8.5
+        engajamento_val=8.5,
+        organizacao_val=8.0
     )
 
     
@@ -41,26 +42,26 @@ def exemplo_multiplos_casos():
     casos = [
         {
             'nome': 'Estudante A - Muito preparado',
-            'valores': (9.0, 9.0, 6.0, 8.0, 9.0)
+            'valores': (9.0, 9.0, 6.0, 8.0, 9.0, 9.0)
         },
         {
             'nome': 'Estudante B - Bem preparado',
-            'valores': (7.0, 7.5, 5.5, 7.0, 7.0)
+            'valores': (7.0, 7.5, 5.5, 7.0, 7.0, 7.5)
         },
         {
             'nome': 'Estudante C - Razoável',
-            'valores': (5.0, 5.5, 5.0, 5.0, 4.5)
+            'valores': (5.0, 5.5, 5.0, 5.0, 4.5, 5.0)
         },
         {
             'nome': 'Estudante D - Precisa melhorar',
-            'valores': (3.0, 4.0, 4.0, 3.0, 3.0)
+            'valores': (3.0, 4.0, 4.0, 3.0, 3.0, 3.0)
         }
     ]
 
     resultados = []
     for caso in casos:
-        c, d, r, m, e = caso['valores']
-        resultado = sistema.avaliar(c, d, r, m, e)
+        c, d, r, m, e, o = caso['valores']
+        resultado = sistema.avaliar(c, d, r, m, e, o)
         resultados.append({
             'nome': caso['nome'],
             'nota': resultado['nota'],
@@ -89,18 +90,18 @@ def exemplo_analise_criterio():
 
     sistema = AvaliacaoApresentacaoFuzzy()
 
-    
-    base = [5.0, 5.0, 5.0, 5.0, 5.0]
+
+    base = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
     resultado_base = sistema.avaliar(*base)
 
     print(f"\nCaso Base (todos 5.0): {resultado_base['nota']:.2f}/10")
     print("\nImpacto ao aumentar cada critério para 9.0:\n")
 
-    criterios = ['Clareza', 'Domínio', 'Ritmo', 'Materiais', 'Engajamento']
+    criterios = ['Clareza', 'Domínio', 'Ritmo', 'Materiais', 'Engajamento', 'Organização']
 
     for i, criterio in enumerate(criterios):
         valores = base.copy()
-        valores[i] = 9.0  
+        valores[i] = 9.0
         resultado = sistema.avaliar(*valores)
         impacto = resultado['nota'] - resultado_base['nota']
         print(f"  {criterio:15s}: {resultado['nota']:4.2f}/10 (Δ +{impacto:4.2f})")
@@ -116,20 +117,20 @@ def exemplo_casos_extremos():
 
     casos_extremos = [
         {
-            'nome': 'Tudo Perfeito (10, 10, 10, 10, 10)',
-            'valores': (10.0, 10.0, 10.0, 10.0, 10.0)
+            'nome': 'Tudo Perfeito (9.5, 9.5, 5, 9, 9.5, 9.5)',
+            'valores': (9.5, 9.5, 5.0, 9.0, 9.5, 9.5)
         },
         {
-            'nome': 'Tudo Mínimo (0, 0, 0, 0, 0)',
-            'valores': (0.0, 0.0, 0.0, 0.0, 0.0)
+            'nome': 'Tudo Mínimo (0, 0, 0, 0, 0, 0)',
+            'valores': (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         },
         {
-            'nome': 'Apenas Clareza Alta (10, 0, 0, 0, 0)',
-            'valores': (10.0, 0.0, 0.0, 0.0, 0.0)
+            'nome': 'Apenas Clareza Alta (10, 0, 0, 0, 0, 0)',
+            'valores': (10.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         },
         {
-            'nome': 'Apenas Engajamento Alto (0, 0, 0, 0, 10)',
-            'valores': (0.0, 0.0, 0.0, 0.0, 10.0)
+            'nome': 'Apenas Organização Alta (0, 0, 0, 0, 0, 10)',
+            'valores': (0.0, 0.0, 0.0, 0.0, 0.0, 10.0)
         }
     ]
 
@@ -155,13 +156,15 @@ def exemplo_cenario_real():
     print("  - Falou um pouco rápido no início (6.5/10)")
     print("  - Slides bem elaborados (8.5/10)")
     print("  - Boa interação com a banca (7.5/10)")
+    print("  - Apresentação bem organizada (8/10)")
 
     resultado = sistema.avaliar(
         clareza_val=8.0,
         dominio_val=9.0,
         ritmo_val=6.5,
         materiais_val=8.5,
-        engajamento_val=7.5
+        engajamento_val=7.5,
+        organizacao_val=8.0
     )
 
     print("\n📊 Avaliação Fuzzy:")
@@ -208,15 +211,15 @@ def exemplo_comparacao_avaliadores():
     avaliadores = [
         {
             'nome': 'Prof. Silva',
-            'valores': (8.0, 8.5, 6.0, 7.5, 8.0)
+            'valores': (8.0, 8.5, 6.0, 7.5, 8.0, 8.0)
         },
         {
             'nome': 'Prof. Santos',
-            'valores': (7.5, 9.0, 5.5, 8.0, 7.5)
+            'valores': (7.5, 9.0, 5.5, 8.0, 7.5, 8.5)
         },
         {
             'nome': 'Prof. Oliveira',
-            'valores': (8.5, 8.0, 6.5, 7.0, 8.5)
+            'valores': (8.5, 8.0, 6.5, 7.0, 8.5, 7.5)
         }
     ]
 
@@ -242,13 +245,14 @@ def exemplo_autoavaliacao():
     print("\n🤔 Você está preparando uma apresentação importante.")
     print("   Avalie a si mesmo nos seguintes critérios (0-10):\n")
 
-    
+
     autoavaliacao = {
         'clareza': 6.5,
         'dominio': 7.0,
         'ritmo': 5.0,
         'materiais': 8.0,
-        'engajamento': 5.5
+        'engajamento': 5.5,
+        'organizacao': 6.0
     }
 
     print(f"  Clareza da explicação: {autoavaliacao['clareza']}")
@@ -256,13 +260,15 @@ def exemplo_autoavaliacao():
     print(f"  Ritmo da fala: {autoavaliacao['ritmo']}")
     print(f"  Qualidade dos slides: {autoavaliacao['materiais']}")
     print(f"  Engajamento: {autoavaliacao['engajamento']}")
+    print(f"  Organização: {autoavaliacao['organizacao']}")
 
     resultado = sistema.avaliar(
         autoavaliacao['clareza'],
         autoavaliacao['dominio'],
         autoavaliacao['ritmo'],
         autoavaliacao['materiais'],
-        autoavaliacao['engajamento']
+        autoavaliacao['engajamento'],
+        autoavaliacao['organizacao']
     )
 
     print(f"\n📊 Sua avaliação atual: {resultado['nota']:.2f}/10 - {resultado['classificacao']}")

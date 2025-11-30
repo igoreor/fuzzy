@@ -2,12 +2,22 @@
 Sistema de Avaliação de Apresentações usando Lógica Fuzzy
 Autor: Sistema Fuzzy
 Data: 2025-11-29
+
+VERSÃO MELHORADA - Agora usa arquitetura modular!
+Para usar a versão avançada com configurações personalizadas, veja fuzzy_system_v2.py
 """
 
 import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 import matplotlib.pyplot as plt
+
+# Tenta importar a nova arquitetura modular
+try:
+    from fuzzy_system_v2 import AvaliacaoApresentacaoFuzzyV2
+    MODULAR_AVAILABLE = True
+except ImportError:
+    MODULAR_AVAILABLE = False
 
 
 class AvaliacaoApresentacaoFuzzy:
@@ -25,50 +35,56 @@ class AvaliacaoApresentacaoFuzzy:
 
     def _criar_variaveis(self):
         """Define as variáveis de entrada e saída do sistema"""
-        # Variáveis de entrada (universo de 0 a 10)
-        self.clareza = ctrl.Antecedent(np.arange(0, 11, 0.1), 'clareza')
-        self.dominio = ctrl.Antecedent(np.arange(0, 11, 0.1), 'dominio')
-        self.ritmo = ctrl.Antecedent(np.arange(0, 11, 0.1), 'ritmo')
-        self.materiais = ctrl.Antecedent(np.arange(0, 11, 0.1), 'materiais')
-        self.engajamento = ctrl.Antecedent(np.arange(0, 11, 0.1), 'engajamento')
+        # Variáveis de entrada (universo de 0 a 10 com precisão de 0.01)
+        self.clareza = ctrl.Antecedent(np.arange(0, 10.1, 0.01), 'clareza')
+        self.dominio = ctrl.Antecedent(np.arange(0, 10.1, 0.01), 'dominio')
+        self.ritmo = ctrl.Antecedent(np.arange(0, 10.1, 0.01), 'ritmo')
+        self.materiais = ctrl.Antecedent(np.arange(0, 10.1, 0.01), 'materiais')
+        self.engajamento = ctrl.Antecedent(np.arange(0, 10.1, 0.01), 'engajamento')
+        self.organizacao = ctrl.Antecedent(np.arange(0, 10.1, 0.01), 'organizacao')
 
         # Variável de saída
-        self.avaliacao = ctrl.Consequent(np.arange(0, 11, 0.1), 'avaliacao')
+        self.avaliacao = ctrl.Consequent(np.arange(0, 10.1, 0.01), 'avaliacao')
 
     def _criar_funcoes_pertinencia(self):
-        """Define as funções de pertinência para cada variável"""
+        """Define as funções de pertinência para cada variável usando Gaussianas"""
 
-        # CLAREZA: Baixa, Média, Alta
-        self.clareza['baixa'] = fuzz.trimf(self.clareza.universe, [0, 0, 4])
-        self.clareza['media'] = fuzz.trimf(self.clareza.universe, [2, 5, 8])
-        self.clareza['alta'] = fuzz.trimf(self.clareza.universe, [6, 10, 10])
+        # CLAREZA: Baixa, Média, Alta (Gaussianas)
+        self.clareza['baixa'] = fuzz.gaussmf(self.clareza.universe, 0, 1.5)
+        self.clareza['media'] = fuzz.gaussmf(self.clareza.universe, 5, 1.5)
+        self.clareza['alta'] = fuzz.gaussmf(self.clareza.universe, 9.0, 1.0)
 
-        # DOMÍNIO: Fraco, Médio, Forte
-        self.dominio['fraco'] = fuzz.trimf(self.dominio.universe, [0, 0, 4])
-        self.dominio['medio'] = fuzz.trimf(self.dominio.universe, [2, 5, 8])
-        self.dominio['forte'] = fuzz.trimf(self.dominio.universe, [6, 10, 10])
+        # DOMÍNIO: Fraco, Médio, Forte (Gaussianas)
+        self.dominio['fraco'] = fuzz.gaussmf(self.dominio.universe, 0, 1.5)
+        self.dominio['medio'] = fuzz.gaussmf(self.dominio.universe, 5, 1.5)
+        self.dominio['forte'] = fuzz.gaussmf(self.dominio.universe, 9.0, 1.0)
 
-        # RITMO: Devagar, Adequado, Rápido
-        self.ritmo['devagar'] = fuzz.trimf(self.ritmo.universe, [0, 0, 4])
-        self.ritmo['adequado'] = fuzz.trimf(self.ritmo.universe, [3, 5, 7])
-        self.ritmo['rapido'] = fuzz.trimf(self.ritmo.universe, [6, 10, 10])
+        # RITMO: Devagar, Adequado, Rápido (Gaussianas)
+        self.ritmo['devagar'] = fuzz.gaussmf(self.ritmo.universe, 0, 1.5)
+        self.ritmo['adequado'] = fuzz.gaussmf(self.ritmo.universe, 5, 1.2)
+        self.ritmo['rapido'] = fuzz.gaussmf(self.ritmo.universe, 9.0, 1.5)
 
-        # MATERIAIS: Ruins, Aceitáveis, Bons
-        self.materiais['ruins'] = fuzz.trimf(self.materiais.universe, [0, 0, 4])
-        self.materiais['aceitaveis'] = fuzz.trimf(self.materiais.universe, [2, 5, 8])
-        self.materiais['bons'] = fuzz.trimf(self.materiais.universe, [6, 10, 10])
+        # MATERIAIS: Ruins, Aceitáveis, Bons (Gaussianas)
+        self.materiais['ruins'] = fuzz.gaussmf(self.materiais.universe, 0, 1.5)
+        self.materiais['aceitaveis'] = fuzz.gaussmf(self.materiais.universe, 5, 1.5)
+        self.materiais['bons'] = fuzz.gaussmf(self.materiais.universe, 9.0, 1.0)
 
-        # ENGAJAMENTO: Baixo, Médio, Alto
-        self.engajamento['baixo'] = fuzz.trimf(self.engajamento.universe, [0, 0, 4])
-        self.engajamento['medio'] = fuzz.trimf(self.engajamento.universe, [2, 5, 8])
-        self.engajamento['alto'] = fuzz.trimf(self.engajamento.universe, [6, 10, 10])
+        # ENGAJAMENTO: Baixo, Médio, Alto (Gaussianas)
+        self.engajamento['baixo'] = fuzz.gaussmf(self.engajamento.universe, 0, 1.5)
+        self.engajamento['medio'] = fuzz.gaussmf(self.engajamento.universe, 5, 1.5)
+        self.engajamento['alto'] = fuzz.gaussmf(self.engajamento.universe, 9.0, 1.0)
 
-        # AVALIAÇÃO FINAL: 5 níveis (ajustado para permitir nota 10)
-        self.avaliacao['precisa_melhorar'] = fuzz.trimf(self.avaliacao.universe, [0, 0, 3])
-        self.avaliacao['aceitavel'] = fuzz.trimf(self.avaliacao.universe, [2, 4, 6])
-        self.avaliacao['bom'] = fuzz.trimf(self.avaliacao.universe, [5, 6.5, 7.5])
-        self.avaliacao['muito_bom'] = fuzz.trimf(self.avaliacao.universe, [7, 8, 9])
-        self.avaliacao['excelente'] = fuzz.trimf(self.avaliacao.universe, [8.5, 10, 10])
+        # ORGANIZAÇÃO: Desorganizada, Estruturada, Excelente (Gaussianas)
+        self.organizacao['desorganizada'] = fuzz.gaussmf(self.organizacao.universe, 0, 1.5)
+        self.organizacao['estruturada'] = fuzz.gaussmf(self.organizacao.universe, 5, 1.5)
+        self.organizacao['excelente'] = fuzz.gaussmf(self.organizacao.universe, 9.5, 0.8)
+
+        # AVALIAÇÃO FINAL: 5 níveis (Gaussianas - ajustado para permitir nota 10)
+        self.avaliacao['precisa_melhorar'] = fuzz.gaussmf(self.avaliacao.universe, 0, 1)
+        self.avaliacao['aceitavel'] = fuzz.gaussmf(self.avaliacao.universe, 4, 1)
+        self.avaliacao['bom'] = fuzz.gaussmf(self.avaliacao.universe, 6.5, 1)
+        self.avaliacao['muito_bom'] = fuzz.gaussmf(self.avaliacao.universe, 8.0, 0.8)
+        self.avaliacao['excelente'] = fuzz.gaussmf(self.avaliacao.universe, 10.0, 0.5)
 
     def _criar_regras(self):
         """
@@ -166,18 +182,51 @@ class AvaliacaoApresentacaoFuzzy:
             self.avaliacao['muito_bom']
         )
 
-        # REGRA 16: Perfeição total - todos os critérios altos
+        # REGRA 16: Perfeição total - todos os critérios altos (REFORÇADA)
         regra16 = ctrl.Rule(
             self.clareza['alta'] & self.dominio['forte'] & self.engajamento['alto'] &
-            self.materiais['bons'] & self.ritmo['adequado'],
+            self.materiais['bons'] & self.ritmo['adequado'] & self.organizacao['excelente'],
             self.avaliacao['excelente']
         )
 
-        # REGRA 17: Excelência mesmo sem materiais perfeitos
+        # REGRA 17: Excelência mesmo sem materiais perfeitos (REFORÇADA)
         regra17 = ctrl.Rule(
             self.clareza['alta'] & self.dominio['forte'] & self.engajamento['alto'] &
+            self.ritmo['adequado'] & self.organizacao['excelente'],
+            self.avaliacao['excelente']
+        )
+
+        # REGRA 18: Compensação - organização excelente compensa materiais aceitáveis
+        regra18 = ctrl.Rule(
+            self.clareza['alta'] & self.dominio['forte'] & self.organizacao['excelente'] &
+            self.materiais['aceitaveis'],
+            self.avaliacao['excelente']
+        )
+
+        # REGRA 19: Compensação - organização excelente com ritmo adequado
+        regra19 = ctrl.Rule(
+            self.clareza['alta'] & self.dominio['forte'] & self.organizacao['excelente'] &
             self.ritmo['adequado'],
             self.avaliacao['excelente']
+        )
+
+        # REGRA 20: Organização estruturada com bons critérios
+        regra20 = ctrl.Rule(
+            self.clareza['alta'] & self.dominio['forte'] & self.organizacao['estruturada'] &
+            self.engajamento['alto'],
+            self.avaliacao['muito_bom']
+        )
+
+        # REGRA 21: Organização desorganizada prejudica
+        regra21 = ctrl.Rule(
+            self.organizacao['desorganizada'] & self.clareza['baixa'],
+            self.avaliacao['precisa_melhorar']
+        )
+
+        # REGRA 22: Organização excelente sozinha não garante excelência
+        regra22 = ctrl.Rule(
+            self.organizacao['excelente'] & self.clareza['media'] & self.dominio['medio'],
+            self.avaliacao['bom']
         )
 
         # Armazena todas as regras
@@ -185,7 +234,8 @@ class AvaliacaoApresentacaoFuzzy:
             regra1, regra2, regra3, regra4, regra5,
             regra6, regra7, regra8, regra9, regra10,
             regra11, regra12, regra13, regra14, regra15,
-            regra16, regra17
+            regra16, regra17, regra18, regra19, regra20,
+            regra21, regra22
         ]
 
     def _criar_sistema_controle(self):
@@ -193,7 +243,7 @@ class AvaliacaoApresentacaoFuzzy:
         self.sistema_ctrl = ctrl.ControlSystem(self.regras)
         self.simulacao = ctrl.ControlSystemSimulation(self.sistema_ctrl)
 
-    def avaliar(self, clareza_val, dominio_val, ritmo_val, materiais_val, engajamento_val):
+    def avaliar(self, clareza_val, dominio_val, ritmo_val, materiais_val, engajamento_val, organizacao_val):
         """
         Avalia uma apresentação com base nos valores de entrada.
 
@@ -203,6 +253,7 @@ class AvaliacaoApresentacaoFuzzy:
             ritmo_val (float): Ritmo da fala (0-10)
             materiais_val (float): Qualidade dos materiais (0-10)
             engajamento_val (float): Engajamento com a plateia (0-10)
+            organizacao_val (float): Organização da apresentação (0-10)
 
         Retorna:
             dict: Dicionário com nota numérica e classificação linguística
@@ -213,6 +264,7 @@ class AvaliacaoApresentacaoFuzzy:
         self.simulacao.input['ritmo'] = ritmo_val
         self.simulacao.input['materiais'] = materiais_val
         self.simulacao.input['engajamento'] = engajamento_val
+        self.simulacao.input['organizacao'] = organizacao_val
 
         # Executa a inferência
         self.simulacao.compute()
@@ -221,7 +273,7 @@ class AvaliacaoApresentacaoFuzzy:
         nota = self.simulacao.output['avaliacao']
         classificacao = self._obter_classificacao(nota)
         feedback = self._gerar_feedback(clareza_val, dominio_val, ritmo_val,
-                                       materiais_val, engajamento_val, nota)
+                                       materiais_val, engajamento_val, organizacao_val, nota)
 
         return {
             'nota': round(nota, 2),
@@ -242,7 +294,7 @@ class AvaliacaoApresentacaoFuzzy:
         else:
             return "Excelente"
 
-    def _gerar_feedback(self, clareza, dominio, ritmo, materiais, engajamento, nota):
+    def _gerar_feedback(self, clareza, dominio, ritmo, materiais, engajamento, organizacao, nota):
         """Gera feedback construtivo baseado nos valores de entrada"""
         sugestoes = []
 
@@ -264,6 +316,10 @@ class AvaliacaoApresentacaoFuzzy:
         if engajamento < 5:
             sugestoes.append("• Faça mais contato visual e interaja com a plateia através de perguntas")
 
+        if organizacao < 5:
+            sugestoes.append("• Estruture melhor a apresentação com introdução, desenvolvimento e conclusão claros")
+            sugestoes.append("• Use roteiros e marcadores para manter a sequência lógica do conteúdo")
+
         if not sugestoes:
             sugestoes.append("• Continue assim! Sua apresentação está excelente!")
 
@@ -271,8 +327,8 @@ class AvaliacaoApresentacaoFuzzy:
 
     def visualizar_pertinencias(self):
         """Gera gráficos das funções de pertinência de todas as variáveis"""
-        fig, axes = plt.subplots(3, 2, figsize=(15, 12))
-        fig.suptitle('Funções de Pertinência - Sistema de Avaliação de Apresentações',
+        fig, axes = plt.subplots(4, 2, figsize=(15, 16))
+        fig.suptitle('Funções de Pertinência Gaussianas - Sistema de Avaliação de Apresentações',
                      fontsize=16, fontweight='bold')
 
         # Clareza
@@ -295,9 +351,16 @@ class AvaliacaoApresentacaoFuzzy:
         self.engajamento.view(ax=axes[2, 0])
         axes[2, 0].set_title('Engajamento')
 
+        # Organização (NOVA)
+        self.organizacao.view(ax=axes[2, 1])
+        axes[2, 1].set_title('Organização')
+
         # Avaliação Final
-        self.avaliacao.view(ax=axes[2, 1])
-        axes[2, 1].set_title('Avaliação Final')
+        self.avaliacao.view(ax=axes[3, 0])
+        axes[3, 0].set_title('Avaliação Final')
+
+        # Remove o subplot vazio
+        fig.delaxes(axes[3, 1])
 
         plt.tight_layout()
         return fig
@@ -314,7 +377,8 @@ if __name__ == "__main__":
         dominio_val=8.0,
         ritmo_val=6.0,
         materiais_val=7.0,
-        engajamento_val=8.5
+        engajamento_val=8.5,
+        organizacao_val=8.0
     )
 
     print("=" * 60)

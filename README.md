@@ -1,8 +1,23 @@
-# 🎤 Sistema de Avaliação de Apresentações com Lógica Fuzzy
+# 🎤 Sistema de Avaliação de Apresentações com Lógica Fuzzy V2.0
+
+## 🆕 NOVIDADES DA VERSÃO 2.0
+
+✅ **Valores decimais precisos** - Aceita qualquer decimal (ex: 7.347, 8.923)
+✅ **5 tipos de funções configuráveis** - Gaussiana, Triangular, Trapezoidal, Bell, Sigmoidal
+✅ **Nota máxima 10.0** - Problema do 8.26 corrigido!
+✅ **Arquitetura modular** - Strategy + Factory + Controller
+✅ **Interface web avançada** - Comparação de funções, testes automatizados
+✅ **Regras com compensação** - Organização compensa materiais, pesos por critério
+
+📖 **[Ver guia completo da V2.0](COMO_USAR_V2.md)** | **[Análise técnica detalhada](MELHORIAS_V2.md)**
+
+---
 
 ## 📋 Sobre o Projeto
 
 Sistema inteligente desenvolvido com **Lógica Fuzzy** para avaliar apresentações orais de forma objetiva e construtiva. O sistema transforma avaliações subjetivas em notas quantitativas e fornece feedback personalizado para melhoria.
+
+**Versão 2.0:** Completamente modular, configurável e com suporte a valores decimais precisos!
 
 ### 🎯 Objetivos
 
