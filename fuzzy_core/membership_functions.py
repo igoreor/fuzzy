@@ -60,14 +60,20 @@ class TriangularMF(MembershipFunctionStrategy):
         range_size = max_val - min_val
 
         if position == 'low':
-            return {'a': min_val, 'b': min_val, 'c': min_val + range_size * 0.4}
+            return {'a': min_val, 'b': min_val, 'c': min_val + range_size * 0.35}
+        elif position == 'low-medium':
+            return {'a': min_val + range_size * 0.1, 'b': min_val + range_size * 0.25,
+                    'c': min_val + range_size * 0.4}
         elif position == 'medium':
-            return {'a': min_val + range_size * 0.2, 'b': min_val + range_size * 0.5,
-                    'c': min_val + range_size * 0.8}
+            return {'a': min_val + range_size * 0.3, 'b': min_val + range_size * 0.5,
+                    'c': min_val + range_size * 0.7}
+        elif position == 'medium-high':
+            return {'a': min_val + range_size * 0.6, 'b': min_val + range_size * 0.75,
+                    'c': min_val + range_size * 0.9}
         elif position == 'high':
-            return {'a': min_val + range_size * 0.6, 'b': max_val, 'c': max_val}
+            return {'a': min_val + range_size * 0.65, 'b': max_val, 'c': max_val}
         else:
-            raise ValueError(f"Position '{position}' não reconhecida")
+            raise ValueError(f"Position '{position}' não reconhecida. Use: 'low', 'low-medium', 'medium', 'medium-high', 'high'")
 
 
 class TrapezoidalMF(MembershipFunctionStrategy):
@@ -91,15 +97,21 @@ class TrapezoidalMF(MembershipFunctionStrategy):
 
         if position == 'low':
             return {'a': min_val, 'b': min_val,
+                    'c': min_val + range_size * 0.25, 'd': min_val + range_size * 0.35}
+        elif position == 'low-medium':
+            return {'a': min_val + range_size * 0.15, 'b': min_val + range_size * 0.2,
                     'c': min_val + range_size * 0.3, 'd': min_val + range_size * 0.4}
         elif position == 'medium':
-            return {'a': min_val + range_size * 0.3, 'b': min_val + range_size * 0.4,
-                    'c': min_val + range_size * 0.6, 'd': min_val + range_size * 0.7}
-        elif position == 'high':
+            return {'a': min_val + range_size * 0.35, 'b': min_val + range_size * 0.45,
+                    'c': min_val + range_size * 0.55, 'd': min_val + range_size * 0.65}
+        elif position == 'medium-high':
             return {'a': min_val + range_size * 0.6, 'b': min_val + range_size * 0.7,
+                    'c': min_val + range_size * 0.8, 'd': min_val + range_size * 0.85}
+        elif position == 'high':
+            return {'a': min_val + range_size * 0.65, 'b': min_val + range_size * 0.75,
                     'c': max_val, 'd': max_val}
         else:
-            raise ValueError(f"Position '{position}' não reconhecida")
+            raise ValueError(f"Position '{position}' não reconhecida. Use: 'low', 'low-medium', 'medium', 'medium-high', 'high'")
 
 
 class GaussianMF(MembershipFunctionStrategy):
@@ -119,19 +131,20 @@ class GaussianMF(MembershipFunctionStrategy):
         min_val, max_val = universe_range
         range_size = max_val - min_val
 
-        # Sigma adaptativo baseado no tamanho do universo
-        sigma_low = range_size * 0.15
-        sigma_medium = range_size * 0.15
-        sigma_high = range_size * 0.10
-
+        # Sigma adaptativo baseado no tamanho do universo e posição
+        # Menor sigma = menos sobreposição = nota máxima mais alta
         if position == 'low':
-            return {'mean': min_val, 'sigma': sigma_low}
+            return {'mean': min_val, 'sigma': range_size * 0.12}
+        elif position == 'low-medium':
+            return {'mean': min_val + range_size * 0.25, 'sigma': range_size * 0.10}
         elif position == 'medium':
-            return {'mean': min_val + range_size * 0.5, 'sigma': sigma_medium}
+            return {'mean': min_val + range_size * 0.5, 'sigma': range_size * 0.12}
+        elif position == 'medium-high':
+            return {'mean': min_val + range_size * 0.75, 'sigma': range_size * 0.10}
         elif position == 'high':
-            return {'mean': max_val, 'sigma': sigma_high}
+            return {'mean': max_val, 'sigma': range_size * 0.08}  # Mais estreito para atingir 10
         else:
-            raise ValueError(f"Position '{position}' não reconhecida")
+            raise ValueError(f"Position '{position}' não reconhecida. Use: 'low', 'low-medium', 'medium', 'medium-high', 'high'")
 
 
 class GeneralizedBellMF(MembershipFunctionStrategy):
@@ -152,17 +165,21 @@ class GeneralizedBellMF(MembershipFunctionStrategy):
         min_val, max_val = universe_range
         range_size = max_val - min_val
 
-        width = range_size * 0.2
-        slope = 2.0
+        width = range_size * 0.15
+        slope = 2.5
 
         if position == 'low':
             return {'a': width, 'b': slope, 'c': min_val}
+        elif position == 'low-medium':
+            return {'a': width * 0.9, 'b': slope, 'c': min_val + range_size * 0.25}
         elif position == 'medium':
             return {'a': width, 'b': slope, 'c': min_val + range_size * 0.5}
+        elif position == 'medium-high':
+            return {'a': width * 0.9, 'b': slope, 'c': min_val + range_size * 0.75}
         elif position == 'high':
-            return {'a': width * 0.8, 'b': slope, 'c': max_val}
+            return {'a': width * 0.75, 'b': slope, 'c': max_val}
         else:
-            raise ValueError(f"Position '{position}' não reconhecida")
+            raise ValueError(f"Position '{position}' não reconhecida. Use: 'low', 'low-medium', 'medium', 'medium-high', 'high'")
 
 
 class SigmoidalMF(MembershipFunctionStrategy):
@@ -183,20 +200,26 @@ class SigmoidalMF(MembershipFunctionStrategy):
         range_size = max_val - min_val
 
         # Inclinação adaptativa
-        slope = 1.0 / (range_size * 0.1)
+        slope = 1.0 / (range_size * 0.08)
 
         if position == 'low':
             # Sigmoide descendente
-            return {'a': -slope, 'c': min_val + range_size * 0.3}
+            return {'a': -slope, 'c': min_val + range_size * 0.25}
+        elif position == 'low-medium':
+            # Para low-medium, usa gaussiana como fallback
+            return GaussianMF().get_default_params('low-medium', universe_range)
         elif position == 'medium':
             # Combinação de duas sigmoides (aproxima trapezoidal)
             # Para medium, retorna gaussiana como fallback
             return GaussianMF().get_default_params('medium', universe_range)
+        elif position == 'medium-high':
+            # Para medium-high, usa gaussiana como fallback
+            return GaussianMF().get_default_params('medium-high', universe_range)
         elif position == 'high':
             # Sigmoide ascendente
-            return {'a': slope, 'c': min_val + range_size * 0.7}
+            return {'a': slope, 'c': min_val + range_size * 0.75}
         else:
-            raise ValueError(f"Position '{position}' não reconhecida")
+            raise ValueError(f"Position '{position}' não reconhecida. Use: 'low', 'low-medium', 'medium', 'medium-high', 'high'")
 
 
 # Factory para criar estratégias
