@@ -1,7 +1,3 @@
-"""
-Interface Web para o Sistema de Avaliação de Apresentações com Lógica Fuzzy V2.0
-Desenvolvido com Streamlit - VERSÃO MODULAR E CONFIGURÁVEL
-"""
 
 import streamlit as st
 import matplotlib.pyplot as plt
@@ -11,7 +7,7 @@ import pandas as pd
 import numpy as np
 
 st.set_page_config(
-    page_title="Avaliador Fuzzy V2.0",
+    page_title="Avaliador Fuzzy",
     page_icon="🎤",
     layout="wide"
 )
@@ -66,11 +62,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Título
-st.markdown('<h1 class="main-header">🎤 Avaliador de Apresentações Fuzzy V2.0</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">🎤 Avaliador de Apresentações Fuzzy</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Sistema modular com funções configuráveis e valores decimais precisos</p>', unsafe_allow_html=True)
 
-# Sidebar com configurações avançadas
 with st.sidebar:
     st.header("⚙️ Configurações do Sistema")
 
@@ -88,31 +82,24 @@ with st.sidebar:
         help="Diferentes tipos produzem resultados ligeiramente diferentes"
     )
 
-    st.markdown("### 📊 Resolução do Universo")
-    resolution = st.select_slider(
-        "Precisão dos cálculos:",
-        options=[101, 501, 1001, 2001],
-        value=1001,
-        format_func=lambda x: f"{x} pontos - {'⚡ Rápido' if x < 500 else '🎯 Preciso' if x < 1500 else '🔬 Ultra-preciso'}",
-        help="Mais pontos = maior precisão, mas processamento mais lento"
-    )
+    resolution = 1001
 
     st.divider()
 
-    st.markdown("### 📚 Sobre o Sistema V2.0")
+    st.markdown("### 📚 Sobre o Sistema")
     st.markdown(f"""
     **Configuração Atual:**
 
     <div class="config-badge">🔧 {function_type.title()}</div>
-    <div class="config-badge">📊 {resolution} pontos</div>
+    <div class="config-badge">📊 1001 pontos (alta precisão)</div>
 
-    **Novidades da V2.0:**
+    **Características:**
 
     ✅ **Valores decimais reais** (ex: 7.347, 8.923)
 
     ✅ **5 tipos de funções** configuráveis
 
-    ✅ **Nota máxima 10.0** (corrigido!)
+    ✅ **Nota máxima 10.0**
 
     ✅ **Regras com compensação** inteligente
 
@@ -132,10 +119,9 @@ with st.sidebar:
 
     st.divider()
 
-    if st.button("📖 Ver Documentação V2"):
+    if st.button("📖 Ver Documentação"):
         st.session_state['show_docs'] = True
 
-# Inicializa o sistema fuzzy com configurações
 @st.cache_resource
 def carregar_sistema(func_type, res):
     try:
@@ -149,15 +135,12 @@ def carregar_sistema(func_type, res):
 
 sistema = carregar_sistema(function_type, resolution)
 
-# Se o sistema não foi carregado, mostra erro e para
 if sistema is None:
     st.error("❌ Falha ao inicializar o sistema fuzzy. Verifique os logs do Docker.")
     st.stop()
 
-# Tabs principais
 tab1, tab2, tab3, tab4 = st.tabs(["🎯 Avaliação", "📊 Comparação de Funções", "📈 Gráficos", "🧪 Testes"])
 
-# TAB 1: Avaliação
 with tab1:
     st.header("Avalie a Apresentação")
 
@@ -168,7 +151,6 @@ with tab1:
     with col1:
         st.subheader("Conteúdo e Comunicação")
 
-        # Modo de input: slider ou número
         input_mode = st.radio(
             "Modo de entrada:",
             options=['slider', 'decimal'],
@@ -265,7 +247,6 @@ with tab1:
 
         st.success("✅ Avaliação concluída!")
 
-        # Exibir resultados
         col_res1, col_res2 = st.columns(2)
 
         with col_res1:
@@ -281,7 +262,6 @@ with tab1:
             st.markdown(resultado['feedback'])
             st.markdown('</div>', unsafe_allow_html=True)
 
-        # Mostrar inputs processados
         st.markdown("### 📋 Valores Processados")
         input_df = pd.DataFrame({
             'Critério': ['Clareza', 'Domínio', 'Ritmo', 'Materiais', 'Engajamento', 'Organização'],
@@ -320,7 +300,6 @@ with tab1:
 
         st.plotly_chart(fig, use_container_width=True)
 
-# TAB 2: Comparação de Funções
 with tab2:
     st.header("📊 Comparação de Tipos de Funções")
     st.markdown("Veja como diferentes funções de pertinência afetam o resultado para **os mesmos valores de entrada**")
@@ -336,8 +315,8 @@ with tab2:
         comp_ritmo = st.number_input("Ritmo:", 0.0, 10.0, 5.0, 0.1, key='comp_ritmo')
 
     with col_comp2:
-        st.write("")  # spacing
-        st.write("")  # spacing
+        st.write("")  
+        st.write("")  
         comp_materiais = st.number_input("Materiais:", 0.0, 10.0, 9.0, 0.1, key='comp_materiais')
         comp_engajamento = st.number_input("Engajamento:", 0.0, 10.0, 9.0, 0.1, key='comp_engajamento')
         comp_organizacao = st.number_input("Organização:", 0.0, 10.0, 9.0, 0.1, key='comp_organizacao')
@@ -350,13 +329,11 @@ with tab2:
         progress_bar = st.progress(0)
 
         for i, tipo in enumerate(tipos):
-            # Cria sistema sem cache para evitar conflitos
             sistema_temp = AvaliacaoApresentacaoFuzzyV2(
                 resolution=1001,
                 function_type=tipo
             )
 
-            # Avalia com valores individuais
             resultado = sistema_temp.avaliar(
                 clareza_val=comp_clareza,
                 dominio_val=comp_dominio,
@@ -380,7 +357,6 @@ with tab2:
         df_comp = pd.DataFrame(comparacao_results)
         st.dataframe(df_comp, use_container_width=True, hide_index=True)
 
-        # Gráfico comparativo
         import plotly.express as px
 
         fig = px.bar(
@@ -395,7 +371,6 @@ with tab2:
         fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
         st.plotly_chart(fig, use_container_width=True)
 
-        # Análise
         st.markdown("### 📊 Análise Estatística")
         col1, col2, col3 = st.columns(3)
 
@@ -406,7 +381,6 @@ with tab2:
         with col3:
             st.metric("Desvio Padrão", f"{df_comp['Nota Final'].std():.3f}")
 
-# TAB 3: Gráficos
 with tab3:
     st.header("Funções de Pertinência")
     st.markdown(f"Visualização das funções de pertinência **{function_type}** com **{resolution} pontos** de resolução")
@@ -417,12 +391,10 @@ with tab3:
             st.pyplot(fig)
             plt.close()
 
-# TAB 4: Testes
 with tab4:
-    st.header("🧪 Exemplos de Teste do Sistema V2.0")
+    st.header("🧪 Exemplos de Teste do Sistema")
     st.markdown("Teste o sistema com casos predefinidos ou valores decimais aleatórios")
 
-    # Define casos de teste
     casos_teste = [
         {
             'nome': '🟣 Perfeição (Nota ~10.0)',
@@ -492,11 +464,9 @@ with tab4:
 
             status_text.text("✅ Testes concluídos!")
 
-            # Exibir resultados em tabela
             df_resultados = pd.DataFrame(resultados_testes)
             st.dataframe(df_resultados, use_container_width=True, hide_index=True)
 
-            # Estatísticas
             st.subheader("📊 Estatísticas dos Testes")
             col1, col2, col3 = st.columns(3)
 
@@ -507,7 +477,6 @@ with tab4:
             with col3:
                 st.metric("Nota Mínima", f"{df_resultados['Nota Final'].min():.2f}")
 
-            # Gráfico de distribuição
             import plotly.express as px
 
             fig = px.bar(
@@ -555,14 +524,11 @@ with tab4:
 
 st.divider()
 
-# Footer com informações
-col_footer1, col_footer2, col_footer3 = st.columns(3)
+col_footer1, col_footer2 = st.columns(2)
 
 with col_footer1:
     st.markdown("### 📚 Recursos")
     st.markdown("""
-    - [MELHORIAS_V2.md](MELHORIAS_V2.md)
-    - [README.md](README.md)
     - Código fonte no GitHub
     """)
 
@@ -570,22 +536,13 @@ with col_footer2:
     st.markdown("### 🔧 Configuração Atual")
     st.markdown(f"""
     - **Função:** {function_type}
-    - **Resolução:** {resolution} pontos
+    - **Resolução:** {resolution} pontos (fixa)
     - **Total de Regras:** {sistema.get_info()['total_rules']}
-    """)
-
-with col_footer3:
-    st.markdown("### ✨ Novidades V2.0")
-    st.markdown("""
-    - ✅ Valores decimais reais
-    - ✅ 5 tipos de funções
-    - ✅ Nota máxima 10.0
-    - ✅ Arquitetura modular
     """)
 
 st.markdown("""
 <div style='text-align: center; color: #666; padding: 20px;'>
-    <p><strong>Sistema de Avaliação de Apresentações com Lógica Fuzzy V2.0</strong></p>
+    <p><strong>Sistema de Avaliação de Apresentações com Lógica Fuzzy</strong></p>
     <p>Desenvolvido com Python, scikit-fuzzy, Streamlit e arquitetura modular</p>
     <p>Suporta valores decimais precisos e múltiplos tipos de funções de pertinência</p>
 </div>
