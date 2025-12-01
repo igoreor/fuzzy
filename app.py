@@ -119,8 +119,6 @@ with st.sidebar:
 
     st.divider()
 
-    if st.button("📖 Ver Documentação"):
-        st.session_state['show_docs'] = True
 
 @st.cache_resource
 def carregar_sistema(func_type, res):
@@ -543,7 +541,6 @@ with col_footer2:
 st.markdown("""
 <div style='text-align: center; color: #666; padding: 20px;'>
     <p><strong>Sistema de Avaliação de Apresentações com Lógica Fuzzy</strong></p>
-    <p>Desenvolvido com Python, scikit-fuzzy, Streamlit e arquitetura modular</p>
     <p>Suporta valores decimais precisos e múltiplos tipos de funções de pertinência</p>
 </div>
 """, unsafe_allow_html=True)
